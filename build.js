@@ -231,7 +231,7 @@ function pageHtml(titleText, sections, count, logo) {
   let body = '';
   sections.sort((a, b) => a.order - b.order).forEach(s => {
     body += `<div class="cat">${esc(s.label)}</div><div class="grid">`;
-    body += s.items.map(cardHtml).join('');
+        body += s.items.slice().sort(bySku).map(cardHtml).join('');
     body += '</div>';
   });
 
