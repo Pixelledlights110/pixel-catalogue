@@ -38,7 +38,8 @@ const CFG = {
   SINGLE_FILE: ['LED controllers'],
   IMG_PX_SMALL: 150,
   PER_ROW_SMALL: 4,
-
+  SECTION_ORDER: 'sku',   // 'sku' = SKU ke hisaab se | 'menu' = website menu ke hisaab se
+  
   BLUE: '#2563EB',
   BLUE_DARK: '#1D4ED8',
   PILL_BG: '#EEF2FF',
@@ -56,6 +57,15 @@ const minOrder = secs => Math.min(...secs.map(s => s.order));
 // SKU ko number ke hisaab se sort karo: 12002 pehle, 12010 baad mein
 const nat = (a, b) => String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' });
 const bySku = (a, b) =>
+const minSku = s => s.items.reduce((m, p) => (p.sku && (!m || nat(p.sku, m) < 0)) ? p.sku : m, '');
+const secOrder = (a, b) => {
+  if (CFG.SECTION_ORDER !== 'sku') return a.order - b.order;
+  const x = minSku(a), y = minSku(b);
+  if (!x && !y) return a.order - b.order;
+  if (!x) return 1;
+  if (!y) return -1;
+  return nat(x, y);
+};
   (!a.sku && !b.sku) ? nat(a.title, b.title)
   : !a.sku ? 1
   : !b.sku ? -1
@@ -241,7 +251,7 @@ function pageHtml(titleText, sections, count, logo, depth, sm) {
   const imgW = sm ? 88 : 118;
 
   let body = '';
-  sections.slice().sort((a, b) => a.order - b.order).forEach(s => {
+    sections.slice().sort(secOrder).forEach(s => {
     const label = s.path.slice(depth).join(' > ') || s.path[s.path.length - 1];
     body += `<div class="cat">${esc(label)}</div><div class="grid">`;
     body += s.items.slice().sort(bySku).map(p => cardHtml(p, sm, imgW)).join('');
