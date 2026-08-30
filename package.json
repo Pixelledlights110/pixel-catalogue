@@ -1,0 +1,11 @@
+{
+  "name": "pixel-catalogue",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "node build.js"
+  },
+  "dependencies": {
+    "puppeteer": "^23.0.0"
+  }
+}
