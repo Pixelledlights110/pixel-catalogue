@@ -18,7 +18,7 @@ const CFG = {
 
   STORE_NAME: 'PIXEL LED LIGHTS',
   TAGLINE: 'Pixel Controller | SMPS | Connection Patta | Readymade Setup',
-  PHONE: ' 9889885204 , 9664139573 , 8502025110',
+  PHONE: '9889885204 | 9664139573 | 8502025110',
   WEBSITE: 'www.pixelledlights.com',
   LOGO_URL: 'https://cdn.shopify.com/s/files/1/0767/3708/5675/files/Pixel_1_666e0a93-7aff-43c9-88d3-f9b2c0e14d6e.png?v=1752496194',
 
@@ -38,8 +38,11 @@ const CFG = {
   SINGLE_FILE: ['LED controllers'],
   IMG_PX_SMALL: 150,
   PER_ROW_SMALL: 4,
-  SECTION_ORDER: 'sku',   // 'sku' = SKU ke hisaab se | 'menu' = website menu ke hisaab se
-  
+
+  // 'sku'  = sections SKU number ke hisaab se (2001 pehle, 2501 baad mein)
+  // 'menu' = sections website menu ke hisaab se
+  SECTION_ORDER: 'sku',
+
   BLUE: '#2563EB',
   BLUE_DARK: '#1D4ED8',
   PILL_BG: '#EEF2FF',
@@ -57,6 +60,12 @@ const minOrder = secs => Math.min(...secs.map(s => s.order));
 // SKU ko number ke hisaab se sort karo: 12002 pehle, 12010 baad mein
 const nat = (a, b) => String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' });
 const bySku = (a, b) =>
+  (!a.sku && !b.sku) ? nat(a.title, b.title)
+  : !a.sku ? 1
+  : !b.sku ? -1
+  : nat(a.sku, b.sku);
+
+// section ka sabse chhota SKU nikalo, usi se sections ka order tay hoga
 const minSku = s => s.items.reduce((m, p) => (p.sku && (!m || nat(p.sku, m) < 0)) ? p.sku : m, '');
 const secOrder = (a, b) => {
   if (CFG.SECTION_ORDER !== 'sku') return a.order - b.order;
@@ -64,12 +73,9 @@ const secOrder = (a, b) => {
   if (!x && !y) return a.order - b.order;
   if (!x) return 1;
   if (!y) return -1;
-  return nat(x, y);
+  const d = nat(x, y);
+  return d !== 0 ? d : a.order - b.order;
 };
-  (!a.sku && !b.sku) ? nat(a.title, b.title)
-  : !a.sku ? 1
-  : !b.sku ? -1
-  : nat(a.sku, b.sku);
 
 /* ---------- MENU ---------- */
 function loadMenu() {
@@ -251,7 +257,7 @@ function pageHtml(titleText, sections, count, logo, depth, sm) {
   const imgW = sm ? 88 : 118;
 
   let body = '';
-    sections.slice().sort(secOrder).forEach(s => {
+  sections.slice().sort(secOrder).forEach(s => {
     const label = s.path.slice(depth).join(' > ') || s.path[s.path.length - 1];
     body += `<div class="cat">${esc(label)}</div><div class="grid">`;
     body += s.items.slice().sort(bySku).map(p => cardHtml(p, sm, imgW)).join('');
