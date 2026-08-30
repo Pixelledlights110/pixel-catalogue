@@ -18,7 +18,7 @@ const CFG = {
 
   STORE_NAME: 'PIXEL LED LIGHTS',
   TAGLINE: 'Pixel Controller | SMPS | Connection Patta | Readymade Setup',
-  PHONE: '+91 9889885204 , 9664139573 , 8502025110',
+  PHONE: ' 9889885204 , 9664139573 , 8502025110',
   WEBSITE: 'www.pixelledlights.com',
   LOGO_URL: 'https://cdn.shopify.com/s/files/1/0767/3708/5675/files/Pixel_1_666e0a93-7aff-43c9-88d3-f9b2c0e14d6e.png?v=1752496194',
 
@@ -33,6 +33,11 @@ const CFG = {
   SPLIT_ABOVE: 250,      // itne se zyada products = category tod do
   MAX_MB: 90,            // GitHub limit safety
   MAKE_FULL: false,      // 1700 products ki ek PDF kaam ki nahi — band rakha hai
+
+  // Ye categories kabhi nahi tutengi — ek hi PDF banegi (chhoti image + 4 per row)
+  SINGLE_FILE: ['LED controllers'],
+  IMG_PX_SMALL: 150,
+  PER_ROW_SMALL: 4,
 
   BLUE: '#2563EB',
   BLUE_DARK: '#1D4ED8',
@@ -89,13 +94,16 @@ async function fetchProducts() {
   let cursor = null, hasNext = true, guard = 0;
 
   const query = `
-    query($cursor: String, $px: Int!) {
+    query($cursor: String, $px: Int!, $spx: Int!) {
       products(first: 100, after: $cursor, query: "status:active", sortKey: TITLE) {
         pageInfo { hasNextPage endCursor }
         nodes {
           title handle totalInventory
           collections(first: 40) { nodes { handle } }
-          featuredImage { url(transform: {maxWidth: $px, maxHeight: $px, preferredContentType: WEBP}) }
+          featuredImage {
+            url(transform: {maxWidth: $px, maxHeight: $px, preferredContentType: WEBP})
+            small: url(transform: {maxWidth: $spx, maxHeight: $spx, preferredContentType: WEBP})
+          }
           priceRangeV2 { minVariantPrice { amount } maxVariantPrice { amount } }
           variants(first: 1) { nodes { sku } }
         }
@@ -106,7 +114,7 @@ async function fetchProducts() {
     const r = await fetch(`https://${CFG.SHOP}/admin/api/${CFG.API_VER}/graphql.json`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Shopify-Access-Token': CFG.TOKEN },
-      body: JSON.stringify({ query, variables: { cursor, px: CFG.IMG_PX } })
+      body: JSON.stringify({ query, variables: { cursor, px: CFG.IMG_PX, spx: CFG.IMG_PX_SMALL } })
     });
     const j = await r.json();
     if (j.errors) throw new Error(JSON.stringify(j.errors));
@@ -118,6 +126,7 @@ async function fetchProducts() {
         cols: n.collections.nodes.map(c => c.handle),
         sku: (n.variants.nodes[0] || {}).sku || '',
         img: n.featuredImage ? n.featuredImage.url : '',
+        imgS: n.featuredImage ? n.featuredImage.small : '',
         url: 'https://' + CFG.WEBSITE.replace(/^www\./, '') + '/products/' + n.handle,
         min: Number(n.priceRangeV2.minVariantPrice.amount),
         max: Number(n.priceRangeV2.maxVariantPrice.amount)
@@ -165,7 +174,7 @@ function footerTpl() {
 }
 
 /* ---------- CSS ---------- */
-function css() {
+function css(perRow, imgW) {
   return `
   @page { size: A4; }
   * { box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
@@ -186,25 +195,27 @@ function css() {
          page-break-after:avoid; break-after:avoid; }
   .cat:first-of-type { margin-top:4px; }
 
-  .grid { display:flex; flex-wrap:wrap; gap:9px; }
-  .card { width:calc((100% - ${(CFG.PER_ROW - 1) * 9}px) / ${CFG.PER_ROW});
+  .grid { display:flex; flex-wrap:wrap; gap:8px; }
+  .card { width:calc((100% - ${(perRow - 1) * 8}px) / ${perRow});
           border:1px solid ${CFG.BORDER}; border-radius:14px; overflow:hidden;
           background:#fff; page-break-inside:avoid; break-inside:avoid; text-align:center; }
 
-  .imgbox { background:${CFG.IMG_BG}; padding:12px; }
-  .imgbox img { width:118px; height:118px; object-fit:contain; display:block; margin:0 auto; }
+  .imgbox { background:${CFG.IMG_BG}; padding:10px; }
+  .imgbox img { width:${imgW}px; height:${imgW}px; object-fit:contain; display:block; margin:0 auto; }
 
-  .title { font-size:11px; font-weight:bold; line-height:14px; height:28px; overflow:hidden;
-           margin:10px 8px 0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+  .title { font-size:${perRow >= 4 ? 10 : 11}px; font-weight:bold;
+           line-height:${perRow >= 4 ? 13 : 14}px; height:${perRow >= 4 ? 26 : 28}px;
+           overflow:hidden; margin:9px 6px 0;
+           display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
 
   .sku { display:inline-block; background:${CFG.PILL_BG}; color:${CFG.BLUE_DARK};
-         font-size:9.5px; font-weight:bold; padding:3px 10px; border-radius:20px; margin-top:8px; }
+         font-size:9px; font-weight:bold; padding:3px 9px; border-radius:20px; margin-top:7px; }
 
-  .price { font-size:15px; font-weight:bold; color:#111827; margin-top:8px; }
+  .price { font-size:${perRow >= 4 ? 13 : 15}px; font-weight:bold; color:#111827; margin-top:7px; }
 
   .btn { display:block; background:${CFG.BLUE}; color:#fff !important; text-decoration:none;
-         font-size:10.5px; font-weight:bold; letter-spacing:.4px;
-         padding:9px 0; border-radius:9px; margin:9px 8px 10px; }
+         font-size:${perRow >= 4 ? 9 : 10.5}px; font-weight:bold; letter-spacing:.4px;
+         padding:8px 0; border-radius:9px; margin:8px 6px 9px; }
 
   .back { height:200mm; display:flex; flex-direction:column; align-items:center;
           justify-content:center; text-align:center; page-break-before:always; }
@@ -213,9 +224,10 @@ function css() {
   `;
 }
 
-function cardHtml(p) {
+function cardHtml(p, sm, imgW) {
+  const src = sm ? (p.imgS || p.img) : p.img;
   return `<div class="card">
-    <div class="imgbox">${p.img ? `<img src="${p.img}">` : '<div style="height:118px"></div>'}</div>
+    <div class="imgbox">${src ? `<img src="${src}">` : `<div style="height:${imgW}px"></div>`}</div>
     <div class="title">${esc(p.title)}</div>
     ${p.sku ? `<div><span class="sku">SKU: ${esc(p.sku)}</span></div>` : ''}
     ${CFG.SHOW_PRICE ? `<div class="price">${money(p.min)}${p.max > p.min ? ' +' : ''}</div>` : ''}
@@ -223,18 +235,20 @@ function cardHtml(p) {
   </div>`;
 }
 
-function pageHtml(titleText, sections, count, logo, depth) {
+function pageHtml(titleText, sections, count, logo, depth, sm) {
   const today = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  const perRow = sm ? CFG.PER_ROW_SMALL : CFG.PER_ROW;
+  const imgW = sm ? 88 : 118;
 
   let body = '';
   sections.slice().sort((a, b) => a.order - b.order).forEach(s => {
     const label = s.path.slice(depth).join(' > ') || s.path[s.path.length - 1];
     body += `<div class="cat">${esc(label)}</div><div class="grid">`;
-    body += s.items.slice().sort(bySku).map(cardHtml).join('');
+    body += s.items.slice().sort(bySku).map(p => cardHtml(p, sm, imgW)).join('');
     body += '</div>';
   });
 
-  return `<!doctype html><html><head><meta charset="utf-8"><style>${css()}</style></head><body>
+  return `<!doctype html><html><head><meta charset="utf-8"><style>${css(perRow, imgW)}</style></head><body>
     <div class="cover">
       ${logo ? `<img class="logo" src="${logo}">` : ''}
       <h1>${CFG.STORE_NAME}</h1>
@@ -281,8 +295,11 @@ async function emit(ctx, titlePath, sections) {
   const count = sections.reduce((n, s) => n + s.items.length, 0);
   const depth = titlePath.length;
 
+  // ye category ek hi PDF mein rehni chahiye?
+  const single = depth === 1 && CFG.SINGLE_FILE.includes(titlePath[0]);
+
   // bada hai? agle level par tod do
-  if (count > CFG.SPLIT_ABOVE) {
+  if (!single && count > CFG.SPLIT_ABOVE) {
     const groups = {};
     sections.forEach(s => {
       const key = s.path[depth];
@@ -301,11 +318,11 @@ async function emit(ctx, titlePath, sections) {
 
   const title = titlePath.join(' > ');
   const file = path.join(CFG.OUT, slug(titlePath.join(' ')) + '.pdf');
-  console.log(`Building ${title} (${count} products, ${sections.length} sections)`);
+  console.log(`Building ${title} (${count} products, ${sections.length} sections)${single ? ' [single file, compact]' : ''}`);
 
   const ok = await printPdf(
     ctx.browser,
-    pageHtml(title, sections, count, ctx.logo, depth),
+    pageHtml(title, sections, count, ctx.logo, depth, single),
     file, ctx.logo,
     CFG.HEADER_RIGHT || `${titlePath[titlePath.length - 1].toUpperCase()} • ${ctx.monthYear}`
   );
@@ -364,7 +381,7 @@ async function emit(ctx, titlePath, sections) {
     for (const top of tops) if (buckets[top]) all.push(...Object.values(buckets[top]));
     const count = all.reduce((n, s) => n + s.items.length, 0);
     console.log(`Building FULL (${count})`);
-    const ok = await printPdf(browser, pageHtml('Full Catalogue', all, count, logo, 0),
+    const ok = await printPdf(browser, pageHtml('Full Catalogue', all, count, logo, 0, true),
       path.join(CFG.OUT, 'full-catalogue.pdf'), logo,
       CFG.HEADER_RIGHT || `PRICE LIST • ${ctx.monthYear}`);
     if (ok) ctx.index.unshift({ name: 'Full Catalogue', file: 'full-catalogue.pdf', count });
