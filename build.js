@@ -49,7 +49,11 @@ const CFG = {
   IMG_BG: '#F4F5F7',
   BORDER: '#E3E6EA',
 
-  OUT: 'out'
+  OUT: 'out',
+
+  // Apna domain — GitHub ka naam customer ko kabhi nahi dikhega
+  CNAME: 'catalogue.pixelledlights.com',
+  PUBLIC_BASE: 'https://catalogue.pixelledlights.com'
 };
 
 const money = n => 'Rs. ' + Math.round(n).toLocaleString('en-IN');
@@ -424,6 +428,17 @@ async function emit(ctx, titlePath, sections) {
     <p style="color:#6B7280">Updated: ${today} &nbsp;|&nbsp; ${ctx.index.length} catalogues</p>
     ${ctx.index.map(i => `<a href="${i.file}">${esc(i.name)}<span>${i.count}</span></a>`).join('')}
     </body></html>`);
+
+  // Shopify page ke liye — script tag se load hoga (CORS ka jhanjhat nahi)
+  fs.writeFileSync(path.join(CFG.OUT, 'catalogue.js'),
+    'window.PLL_CATALOGUE=' + JSON.stringify({
+      updated: today,
+      base: CFG.PUBLIC_BASE,
+      items: ctx.index.map(i => ({ name: i.name, file: i.file, count: i.count }))
+    }) + ';');
+
+  // custom domain ke liye (har build par banega, warna Pages setting reset ho jaati hai)
+  if (CFG.CNAME) fs.writeFileSync(path.join(CFG.OUT, 'CNAME'), CFG.CNAME + '\n');
 
   console.log(`\nDone. ${ctx.index.length} PDFs in /out`);
 })();
