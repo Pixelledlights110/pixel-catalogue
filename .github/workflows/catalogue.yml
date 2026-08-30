@@ -35,6 +35,13 @@ jobs:
           force_orphan: true
           cname: catalogue.pixelledlights.com
 
-      # GitHub 60 din inactivity ke baad cron band kar deta hai — ye usse rokta hai
+      # GitHub 60 din tak koi commit na ho to cron band kar deta hai.
+      # Ye har build par ek chhoti file update karke usse zinda rakhta hai.
       - name: Keep schedule alive
-        uses: gautamkrishnar/keepalive-workflow@v2
+        run: |
+          date -u +"Last build: %Y-%m-%d %H:%M UTC" > .last-build
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .last-build
+          git diff --staged --quiet || git commit -m "keepalive: last build timestamp [skip ci]"
+          git push
