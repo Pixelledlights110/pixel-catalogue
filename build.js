@@ -39,6 +39,9 @@ const money = n => 'Rs. ' + Math.round(n).toLocaleString('en-IN');
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'other';
 
+// "Connection Patta > S Type"  ->  "Connection Patta"
+const topCat = s => String(s).split('>')[0].trim() || 'Other Products';
+
 /* ---------- LOGO -> base64 (header mein image tabhi dikhti hai) ---------- */
 async function toDataUri(url) {
   if (!url) return '';
@@ -194,11 +197,11 @@ function cardHtml(p) {
   </div>`;
 }
 
-function pageHtml(titleText, products, groupByType, logo) {
+function pageHtml(titleText, products, logo) {
   const today = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
   const groups = {};
-  products.forEach(p => { (groups[groupByType ? p.type : titleText] ||= []).push(p); });
+  products.forEach(p => { (groups[p.type] ||= []).push(p); });
 
   let body = '';
   Object.keys(groups).sort().forEach(g => {
@@ -261,19 +264,19 @@ async function printPdf(browser, html, file, logo, rightText) {
   const monthYear = new Date().toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }).toUpperCase();
 
   const byCat = {};
-  products.forEach(p => { (byCat[p.type] ||= []).push(p); });
+  products.forEach(p => { (byCat[topCat(p.type)] ||= []).push(p); });
 
   const index = [];
   for (const cat of Object.keys(byCat).sort()) {
     const file = path.join(CFG.OUT, slug(cat) + '.pdf');
     const right = CFG.HEADER_RIGHT || `${cat.toUpperCase()} • ${monthYear}`;
     console.log(`Building ${cat} (${byCat[cat].length})`);
-    await printPdf(browser, pageHtml(cat, byCat[cat], false, logo), file, logo, right);
+    await printPdf(browser, pageHtml(cat, byCat[cat], logo), file, logo, right);
     index.push({ name: cat, file: slug(cat) + '.pdf', count: byCat[cat].length });
   }
 
   console.log(`Building FULL (${products.length})`);
-  await printPdf(browser, pageHtml('Full Catalogue', products, true, logo),
+  await printPdf(browser, pageHtml('Full Catalogue', products, logo),
                  path.join(CFG.OUT, 'full-catalogue.pdf'), logo,
                  CFG.HEADER_RIGHT || `PRICE LIST • ${monthYear}`);
   index.unshift({ name: 'Full Catalogue', file: 'full-catalogue.pdf', count: products.length });
