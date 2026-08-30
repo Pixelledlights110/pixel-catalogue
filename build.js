@@ -1,6 +1,11 @@
 /**
- * PIXEL LED LIGHTS — AUTO PDF CATALOGUE (Chrome engine) — v2
- * Naya: har page par branded HEADER (logo + blue diagonal) aur blue FOOTER bar
+ * PIXEL LED LIGHTS — AUTO PDF CATALOGUE (Chrome engine) — v3
+ *
+ * v3 mein kya naya:
+ *  - Category ab menu.json (aapke website ke mega menu) se aati hai, Product Type se nahi
+ *  - Sirf 12 main categories ki PDF banegi
+ *  - Andar sub-collection ke hisaab se sections
+ *  - Header ka blue design ab content ko overlap nahi karega
  */
 
 const fs = require('fs');
@@ -18,14 +23,17 @@ const CFG = {
   WEBSITE: 'www.pixelledlights.com',
   LOGO_URL: 'https://cdn.shopify.com/s/files/1/0767/3708/5675/files/Pixel_1_666e0a93-7aff-43c9-88d3-f9b2c0e14d6e.png?v=1752496194',
 
-  HEADER_RIGHT: '',                        // khaali = category naam + month auto aayega
+  HEADER_RIGHT: '',
   FOOTER_NOTE: 'Rates GST extra | Transport charges alag',
 
   SHOW_PRICE: true,
   ONLY_IN_STOCK: false,
   PER_ROW: 3,
   IMG_PX: 250,
-  MAX_MB: 90,          // GitHub ki limit 100MB — isse upar wali file skip ho jayegi
+  MAX_MB: 90,
+
+  SECTION_DEPTH: 2,        // heading mein menu ke kitne level dikhayein
+  MAKE_FULL: true,         // full catalogue banani hai ya nahi
 
   BLUE: '#2563EB',
   BLUE_DARK: '#1D4ED8',
@@ -40,18 +48,34 @@ const money = n => 'Rs. ' + Math.round(n).toLocaleString('en-IN');
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'other';
 
-// "Connection Patta > S Type"  ->  "Connection Patta"
-const topCat = s => String(s).split('>')[0].trim() || 'Other Products';
+/* ---------- MENU ---------- */
+// handle -> { path: ['LED controllers','IC controllers',...], order: n }
+function loadMenu() {
+  const menu = JSON.parse(fs.readFileSync(path.join(__dirname, 'menu.json'), 'utf8'));
+  const map = {};
+  const tops = Object.keys(menu);
+  let order = 0;
 
-/* ---------- LOGO -> base64 (header mein image tabhi dikhti hai) ---------- */
+  (function walk(node, trail) {
+    for (const [name, v] of Object.entries(node)) {
+      const p = [...trail, name];
+      const h = (v.url || '').split('/collections/')[1];
+      if (h) map[h.split('?')[0].replace(/\/$/, '')] = { path: p, order: order++ };
+      walk(v.children || {}, p);
+    }
+  })(menu, []);
+
+  return { map, tops };
+}
+
+/* ---------- LOGO ---------- */
 async function toDataUri(url) {
   if (!url) return '';
   try {
     const r = await fetch(url);
     if (!r.ok) return '';
     const buf = Buffer.from(await r.arrayBuffer());
-    const ct = r.headers.get('content-type') || 'image/png';
-    return `data:${ct};base64,${buf.toString('base64')}`;
+    return `data:${r.headers.get('content-type') || 'image/png'};base64,${buf.toString('base64')}`;
   } catch (e) {
     console.log('Logo load fail:', e.message);
     return '';
@@ -68,7 +92,8 @@ async function fetchProducts() {
       products(first: 100, after: $cursor, query: "status:active", sortKey: TITLE) {
         pageInfo { hasNextPage endCursor }
         nodes {
-          title handle productType totalInventory
+          title handle totalInventory
+          collections(first: 40) { nodes { handle } }
           featuredImage { url(transform: {maxWidth: $px, maxHeight: $px, preferredContentType: WEBP}) }
           priceRangeV2 { minVariantPrice { amount } maxVariantPrice { amount } }
           variants(first: 1) { nodes { sku } }
@@ -89,7 +114,7 @@ async function fetchProducts() {
       if (CFG.ONLY_IN_STOCK && n.totalInventory <= 0) continue;
       out.push({
         title: n.title,
-        type: n.productType || 'Other Products',
+        cols: n.collections.nodes.map(c => c.handle),
         sku: (n.variants.nodes[0] || {}).sku || '',
         img: n.featuredImage ? n.featuredImage.url : '',
         url: 'https://' + CFG.WEBSITE.replace(/^www\./, '') + '/products/' + n.handle,
@@ -103,23 +128,23 @@ async function fetchProducts() {
   return out;
 }
 
-/* ---------- HEADER / FOOTER (har page par) ---------- */
+/* ---------- HEADER / FOOTER ---------- */
 function headerTpl(logo, rightText) {
   return `
   <div style="width:100%;height:100%;margin:0;padding:0;position:relative;
               font-family:Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;">
-    <div style="position:absolute;top:0;right:0;width:58%;height:100%;
+    <div style="position:absolute;top:0;right:0;width:58%;height:66%;
                 background:${CFG.BLUE_DARK};
                 clip-path:polygon(18% 0, 100% 0, 100% 100%, 0 100%);"></div>
-    <div style="position:absolute;top:0;right:0;width:58%;height:100%;
+    <div style="position:absolute;top:0;right:0;width:58%;height:66%;
                 background:${CFG.BLUE};opacity:.40;
                 clip-path:polygon(34% 0, 100% 0, 100% 100%, 16% 100%);"></div>
     ${logo
-      ? `<img src="${logo}" style="position:absolute;left:34px;top:14px;height:34px;">`
-      : `<div style="position:absolute;left:34px;top:20px;font-size:15px;font-weight:bold;
+      ? `<img src="${logo}" style="position:absolute;left:34px;top:12px;height:30px;">`
+      : `<div style="position:absolute;left:34px;top:17px;font-size:14px;font-weight:bold;
                      color:${CFG.BLUE_DARK};letter-spacing:1px;">${CFG.STORE_NAME}</div>`}
-    <div style="position:absolute;right:34px;top:24px;color:#ffffff;
-                font-size:10px;font-weight:bold;letter-spacing:1.2px;">${rightText}</div>
+    <div style="position:absolute;right:34px;top:20px;color:#ffffff;
+                font-size:9.5px;font-weight:bold;letter-spacing:1.1px;">${rightText}</div>
   </div>`;
 }
 
@@ -127,39 +152,40 @@ function footerTpl() {
   return `
   <div style="width:100%;height:100%;margin:0;padding:0;position:relative;
               font-family:Arial,Helvetica,sans-serif;-webkit-print-color-adjust:exact;">
-    <div style="position:absolute;bottom:0;left:0;width:100%;height:30px;
+    <div style="position:absolute;bottom:0;left:0;width:100%;height:28px;
                 background:${CFG.BLUE_DARK};color:#ffffff;font-size:8.5px;">
-      <div style="position:absolute;left:34px;top:10px;font-weight:bold;">${CFG.WEBSITE}</div>
-      <div style="position:absolute;left:0;right:0;top:10px;text-align:center;">
+      <div style="position:absolute;left:34px;top:9px;font-weight:bold;">${CFG.WEBSITE}</div>
+      <div style="position:absolute;left:0;right:0;top:9px;text-align:center;">
         WhatsApp: ${CFG.PHONE} &nbsp;&nbsp;|&nbsp;&nbsp; ${CFG.FOOTER_NOTE}
       </div>
-      <div style="position:absolute;right:34px;top:10px;font-weight:bold;">
+      <div style="position:absolute;right:34px;top:9px;font-weight:bold;">
         <span class="pageNumber"></span> / <span class="totalPages"></span>
       </div>
     </div>
   </div>`;
 }
 
-/* ---------- PAGE CSS ---------- */
+/* ---------- CSS ---------- */
 function css() {
   return `
   @page { size: A4; }
   * { box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   body { margin:0; font-family:Arial,"Helvetica Neue",Helvetica,sans-serif; color:#111827; }
 
-  .cover { height:225mm; display:flex; flex-direction:column; align-items:center;
+  .cover { height:210mm; display:flex; flex-direction:column; align-items:center;
            justify-content:center; text-align:center; page-break-after:always; }
   .cover .logo { width:230px; margin-bottom:26px; }
-  .cover h1 { font-size:40px; letter-spacing:3px; margin:0; }
+  .cover h1 { font-size:38px; letter-spacing:3px; margin:0; }
   .cover .tag { color:#6B7280; font-size:15px; margin-top:10px; }
-  .cover .rule { width:130px; height:5px; background:${CFG.BLUE}; border-radius:3px; margin:30px 0; }
-  .cover h2 { font-size:26px; margin:0; }
+  .cover .rule { width:130px; height:5px; background:${CFG.BLUE}; border-radius:3px; margin:28px 0; }
+  .cover h2 { font-size:25px; margin:0; }
   .cover .meta { color:#6B7280; font-size:14px; margin-top:10px; }
-  .cover .contact { margin-top:50px; font-size:15px; font-weight:bold; }
+  .cover .contact { margin-top:45px; font-size:15px; font-weight:bold; }
 
-  .cat { background:#111827; color:#fff; font-size:15px; font-weight:bold;
-         padding:9px 14px; border-radius:8px; margin:14px 0 11px;
+  .cat { background:#111827; color:#fff; font-size:14px; font-weight:bold;
+         padding:9px 14px; border-radius:8px; margin:16px 0 11px;
          page-break-after:avoid; break-after:avoid; }
+  .cat:first-of-type { margin-top:4px; }
 
   .grid { display:flex; flex-wrap:wrap; gap:9px; }
   .card { width:calc((100% - ${(CFG.PER_ROW - 1) * 9}px) / ${CFG.PER_ROW});
@@ -181,7 +207,7 @@ function css() {
          font-size:10.5px; font-weight:bold; letter-spacing:.4px;
          padding:9px 0; border-radius:9px; margin:9px 8px 10px; }
 
-  .back { height:215mm; display:flex; flex-direction:column; align-items:center;
+  .back { height:200mm; display:flex; flex-direction:column; align-items:center;
           justify-content:center; text-align:center; page-break-before:always; }
   .back .ph { font-size:32px; font-weight:bold; color:${CFG.BLUE_DARK}; margin-top:14px; }
   .back .note { font-size:12px; color:#6B7280; margin-top:26px; }
@@ -198,16 +224,14 @@ function cardHtml(p) {
   </div>`;
 }
 
-function pageHtml(titleText, products, logo) {
+/** sections = [{ label, order, items:[] }] */
+function pageHtml(titleText, sections, count, logo) {
   const today = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
-  const groups = {};
-  products.forEach(p => { (groups[p.type] ||= []).push(p); });
-
   let body = '';
-  Object.keys(groups).sort().forEach(g => {
-    body += `<div class="cat">${esc(g)}</div><div class="grid">`;
-    body += groups[g].map(cardHtml).join('');
+  sections.sort((a, b) => a.order - b.order).forEach(s => {
+    body += `<div class="cat">${esc(s.label)}</div><div class="grid">`;
+    body += s.items.map(cardHtml).join('');
     body += '</div>';
   });
 
@@ -218,7 +242,7 @@ function pageHtml(titleText, products, logo) {
       <div class="tag">${CFG.TAGLINE}</div>
       <div class="rule"></div>
       <h2>${esc(titleText.toUpperCase())}</h2>
-      <div class="meta">Updated: ${today} &nbsp;|&nbsp; ${products.length} Products</div>
+      <div class="meta">Updated: ${today} &nbsp;|&nbsp; ${count} Products</div>
       <div class="contact">${CFG.PHONE} &nbsp;|&nbsp; ${CFG.WEBSITE}</div>
     </div>
     ${body}
@@ -242,7 +266,7 @@ async function printPdf(browser, html, file, logo, rightText) {
     displayHeaderFooter: true,
     headerTemplate: headerTpl(logo, rightText),
     footerTemplate: footerTpl(),
-    margin: { top: '24mm', bottom: '20mm', left: '10mm', right: '10mm' }
+    margin: { top: '30mm', bottom: '20mm', left: '10mm', right: '10mm' }
   });
   await page.close();
 
@@ -260,35 +284,78 @@ async function printPdf(browser, html, file, logo, rightText) {
 (async () => {
   if (!CFG.SHOP || !CFG.TOKEN) throw new Error('SHOPIFY_SHOP / SHOPIFY_TOKEN missing');
 
+  const { map, tops } = loadMenu();
+  console.log(`Menu: ${tops.length} main categories, ${Object.keys(map).length} collections`);
+
   const logo = await toDataUri(CFG.LOGO_URL);
   console.log(logo ? 'Logo loaded' : 'Logo missing — text logo use hoga');
 
   console.log('Fetching products...');
   const products = await fetchProducts();
-  console.log(`Total: ${products.length}`);
+  console.log(`Total products: ${products.length}`);
+
+  // har product ko menu ki sabse gehri (deepest) collection se jodo
+  const buckets = {};                  // topCategory -> { label -> {label, order, items} }
+  let unmatched = 0;
+
+  for (const p of products) {
+    let best = null;
+    for (const h of p.cols) {
+      const m = map[h];
+      if (m && (!best || m.path.length > best.path.length)) best = m;
+    }
+    if (!best) { unmatched++; continue; }
+
+    const top = best.path[0];
+    const label = best.path.slice(1, 1 + CFG.SECTION_DEPTH).join(' > ') || top;
+
+    buckets[top] ||= {};
+    buckets[top][label] ||= { label, order: best.order, items: [] };
+    buckets[top][label].items.push(p);
+    buckets[top][label].order = Math.min(buckets[top][label].order, best.order);
+  }
+
+  console.log(`Menu se match hue: ${products.length - unmatched} | match nahi hue: ${unmatched}`);
 
   fs.mkdirSync(CFG.OUT, { recursive: true });
   const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage'] });
-
   const monthYear = new Date().toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }).toUpperCase();
 
-  const byCat = {};
-  products.forEach(p => { (byCat[topCat(p.type)] ||= []).push(p); });
-
   const index = [];
-  for (const cat of Object.keys(byCat).sort()) {
-    const file = path.join(CFG.OUT, slug(cat) + '.pdf');
-    const right = CFG.HEADER_RIGHT || `${cat.toUpperCase()} • ${monthYear}`;
-    console.log(`Building ${cat} (${byCat[cat].length})`);
-    const ok = await printPdf(browser, pageHtml(cat, byCat[cat], logo), file, logo, right);
-    if (ok) index.push({ name: cat, file: slug(cat) + '.pdf', count: byCat[cat].length });
+
+  for (const top of tops) {                        // menu ka order maintain
+    const secMap = buckets[top];
+    if (!secMap) { console.log(`Skip ${top} — koi product nahi`); continue; }
+
+    const sections = Object.values(secMap);
+    const count = sections.reduce((n, s) => n + s.items.length, 0);
+    const file = path.join(CFG.OUT, slug(top) + '.pdf');
+
+    console.log(`Building ${top} (${count} products, ${sections.length} sections)`);
+    const ok = await printPdf(
+      browser,
+      pageHtml(top, sections, count, logo),
+      file, logo,
+      CFG.HEADER_RIGHT || `${top.toUpperCase()} • ${monthYear}`
+    );
+    if (ok) index.push({ name: top, file: slug(top) + '.pdf', count });
   }
 
-  console.log(`Building FULL (${products.length})`);
-  const fullOk = await printPdf(browser, pageHtml('Full Catalogue', products, logo),
-                 path.join(CFG.OUT, 'full-catalogue.pdf'), logo,
-                 CFG.HEADER_RIGHT || `PRICE LIST • ${monthYear}`);
-  if (fullOk) index.unshift({ name: 'Full Catalogue', file: 'full-catalogue.pdf', count: products.length });
+  if (CFG.MAKE_FULL) {
+    const all = [];
+    for (const top of tops) {
+      const secMap = buckets[top];
+      if (!secMap) continue;
+      Object.values(secMap).forEach(s =>
+        all.push({ label: `${top} > ${s.label}`, order: s.order, items: s.items }));
+    }
+    const count = all.reduce((n, s) => n + s.items.length, 0);
+    console.log(`Building FULL (${count})`);
+    const ok = await printPdf(browser, pageHtml('Full Catalogue', all, count, logo),
+      path.join(CFG.OUT, 'full-catalogue.pdf'), logo,
+      CFG.HEADER_RIGHT || `PRICE LIST • ${monthYear}`);
+    if (ok) index.unshift({ name: 'Full Catalogue', file: 'full-catalogue.pdf', count });
+  }
 
   await browser.close();
 
