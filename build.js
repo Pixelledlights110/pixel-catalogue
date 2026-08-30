@@ -57,6 +57,13 @@ const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(
 const slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'other';
 const minOrder = secs => Math.min(...secs.map(s => s.order));
 
+// Date + time hamesha India ke time par (GitHub ka server UTC par chalta hai)
+const stamp = () => new Date().toLocaleString('en-IN', {
+  timeZone: 'Asia/Kolkata',
+  day: '2-digit', month: 'short', year: 'numeric',
+  hour: '2-digit', minute: '2-digit', hour12: true
+}).replace(/\s*(am|pm)/i, m => ' ' + m.trim().toUpperCase());
+
 // SKU ko number ke hisaab se sort karo: 12002 pehle, 12010 baad mein
 const nat = (a, b) => String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' });
 const bySku = (a, b) =>
@@ -252,7 +259,7 @@ function cardHtml(p, sm, imgW) {
 }
 
 function pageHtml(titleText, sections, count, logo, depth, sm) {
-  const today = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  const today = stamp();
   const perRow = sm ? CFG.PER_ROW_SMALL : CFG.PER_ROW;
   const imgW = sm ? 88 : 118;
 
@@ -405,7 +412,7 @@ async function emit(ctx, titlePath, sections) {
 
   await browser.close();
 
-  const today = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+  const today = stamp();
   fs.writeFileSync(path.join(CFG.OUT, 'index.html'), `<!doctype html><html><head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>${CFG.STORE_NAME} — Catalogue</title>
