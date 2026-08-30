@@ -24,7 +24,8 @@ const CFG = {
   SHOW_PRICE: true,
   ONLY_IN_STOCK: false,
   PER_ROW: 3,
-  IMG_PX: 400,
+  IMG_PX: 250,
+  MAX_MB: 90,          // GitHub ki limit 100MB — isse upar wali file skip ho jayegi
 
   BLUE: '#2563EB',
   BLUE_DARK: '#1D4ED8',
@@ -68,7 +69,7 @@ async function fetchProducts() {
         pageInfo { hasNextPage endCursor }
         nodes {
           title handle productType totalInventory
-          featuredImage { url(transform: {maxWidth: $px, maxHeight: $px}) }
+          featuredImage { url(transform: {maxWidth: $px, maxHeight: $px, preferredContentType: WEBP}) }
           priceRangeV2 { minVariantPrice { amount } maxVariantPrice { amount } }
           variants(first: 1) { nodes { sku } }
         }
@@ -244,7 +245,15 @@ async function printPdf(browser, html, file, logo, rightText) {
     margin: { top: '24mm', bottom: '20mm', left: '10mm', right: '10mm' }
   });
   await page.close();
-  console.log(`  ${path.basename(file)}  ${(fs.statSync(file).size / 1048576).toFixed(1)} MB`);
+
+  const mb = fs.statSync(file).size / 1048576;
+  if (mb > CFG.MAX_MB) {
+    fs.unlinkSync(file);
+    console.log(`  !! ${path.basename(file)}  ${mb.toFixed(1)} MB — bahut bada, SKIP kiya`);
+    return false;
+  }
+  console.log(`  ${path.basename(file)}  ${mb.toFixed(1)} MB`);
+  return true;
 }
 
 /* ---------- MAIN ---------- */
@@ -271,15 +280,15 @@ async function printPdf(browser, html, file, logo, rightText) {
     const file = path.join(CFG.OUT, slug(cat) + '.pdf');
     const right = CFG.HEADER_RIGHT || `${cat.toUpperCase()} • ${monthYear}`;
     console.log(`Building ${cat} (${byCat[cat].length})`);
-    await printPdf(browser, pageHtml(cat, byCat[cat], logo), file, logo, right);
-    index.push({ name: cat, file: slug(cat) + '.pdf', count: byCat[cat].length });
+    const ok = await printPdf(browser, pageHtml(cat, byCat[cat], logo), file, logo, right);
+    if (ok) index.push({ name: cat, file: slug(cat) + '.pdf', count: byCat[cat].length });
   }
 
   console.log(`Building FULL (${products.length})`);
-  await printPdf(browser, pageHtml('Full Catalogue', products, logo),
+  const fullOk = await printPdf(browser, pageHtml('Full Catalogue', products, logo),
                  path.join(CFG.OUT, 'full-catalogue.pdf'), logo,
                  CFG.HEADER_RIGHT || `PRICE LIST • ${monthYear}`);
-  index.unshift({ name: 'Full Catalogue', file: 'full-catalogue.pdf', count: products.length });
+  if (fullOk) index.unshift({ name: 'Full Catalogue', file: 'full-catalogue.pdf', count: products.length });
 
   await browser.close();
 
