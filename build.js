@@ -18,7 +18,7 @@ const CFG = {
 
   STORE_NAME: 'PIXEL LED LIGHTS',
   TAGLINE: 'Pixel Controller | SMPS | Connection Patta | Readymade Setup',
-  PHONE: '9889885204 | 9664139573 | 8502025110',
+  PHONE: '7742539573 | 9114111172 | 9114111173 | 9114111174',
   WEBSITE: 'www.pixelledlights.com',
   LOGO_URL: 'https://cdn.shopify.com/s/files/1/0767/3708/5675/files/Pixel_1_666e0a93-7aff-43c9-88d3-f9b2c0e14d6e.png?v=1752496194',
 
