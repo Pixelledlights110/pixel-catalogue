@@ -1,0 +1,638 @@
+[
+ {
+  "sku": "1002",
+  "group": "PIXEL LED LADI (MULTICOLOR)",
+  "mrp": 300,
+  "sale": 240
+ },
+ {
+  "sku": "1004",
+  "group": "PIXEL LED LADI (MULTICOLOR)",
+  "mrp": 320,
+  "sale": 255
+ },
+ {
+  "sku": "1042",
+  "group": "PIXEL LED LADI (MULTICOLOR)",
+  "mrp": 260,
+  "sale": 210
+ },
+ {
+  "sku": "1109",
+  "group": "PIXEL LED LADI (MULTICOLOR)",
+  "mrp": 225,
+  "sale": 180
+ },
+ {
+  "sku": "1016",
+  "group": "PIXEL LED LADI (SINGLE COLOR)",
+  "mrp": 55,
+  "sale": 50
+ },
+ {
+  "sku": "1017",
+  "group": "PIXEL LED LADI (SINGLE COLOR)",
+  "mrp": 55,
+  "sale": 50
+ },
+ {
+  "sku": "1018",
+  "group": "PIXEL LED LADI (SINGLE COLOR)",
+  "mrp": 55,
+  "sale": 50
+ },
+ {
+  "sku": "1019",
+  "group": "PIXEL LED LADI (SINGLE COLOR)",
+  "mrp": 55,
+  "sale": 50
+ },
+ {
+  "sku": "1020",
+  "group": "PIXEL LED LADI (SINGLE COLOR)",
+  "mrp": 55,
+  "sale": 50
+ },
+ {
+  "sku": "1021",
+  "group": "PIXEL LED LADI (SINGLE COLOR)",
+  "mrp": 55,
+  "sale": 50
+ },
+ {
+  "sku": "1044",
+  "group": "PIXEL LED LADI (SINGLE COLOR)",
+  "mrp": 55,
+  "sale": 50
+ },
+ {
+  "sku": "1048",
+  "group": "PIXEL LED LADI (FROSTED)",
+  "mrp": 65,
+  "sale": 55
+ },
+ {
+  "sku": "1049",
+  "group": "PIXEL LED LADI (FROSTED)",
+  "mrp": 65,
+  "sale": 55
+ },
+ {
+  "sku": "1050",
+  "group": "PIXEL LED LADI (FROSTED)",
+  "mrp": 65,
+  "sale": 55
+ },
+ {
+  "sku": "1051",
+  "group": "PIXEL LED LADI (FROSTED)",
+  "mrp": 65,
+  "sale": 55
+ },
+ {
+  "sku": "1052",
+  "group": "PIXEL LED LADI (FROSTED)",
+  "mrp": 65,
+  "sale": 55
+ },
+ {
+  "sku": "1053",
+  "group": "PIXEL LED LADI (FROSTED)",
+  "mrp": 65,
+  "sale": 55
+ },
+ {
+  "sku": "1080",
+  "group": "PIXEL LED LADI (FROSTED)",
+  "mrp": 65,
+  "sale": 55
+ },
+ {
+  "sku": "1111",
+  "group": "PIXEL LED LADI (PURE COPPER)",
+  "mrp": 80,
+  "sale": 70
+ },
+ {
+  "sku": "1112",
+  "group": "PIXEL LED LADI (PURE COPPER)",
+  "mrp": 80,
+  "sale": 70
+ },
+ {
+  "sku": "1113",
+  "group": "PIXEL LED LADI (PURE COPPER)",
+  "mrp": 80,
+  "sale": 70
+ },
+ {
+  "sku": "1114",
+  "group": "PIXEL LED LADI (PURE COPPER)",
+  "mrp": 80,
+  "sale": 70
+ },
+ {
+  "sku": "1115",
+  "group": "PIXEL LED LADI (PURE COPPER)",
+  "mrp": 80,
+  "sale": 70
+ },
+ {
+  "sku": "1116",
+  "group": "PIXEL LED LADI (PURE COPPER)",
+  "mrp": 80,
+  "sale": 70
+ },
+ {
+  "sku": "1117",
+  "group": "PIXEL LED LADI (PURE COPPER)",
+  "mrp": 80,
+  "sale": 70
+ },
+ {
+  "sku": "1121",
+  "group": "PIXEL LED LADI (PURE COPPER)",
+  "mrp": 70,
+  "sale": 60
+ },
+ {
+  "sku": "1122",
+  "group": "PIXEL LED LADI (PURE COPPER)",
+  "mrp": 70,
+  "sale": 60
+ },
+ {
+  "sku": "1123",
+  "group": "PIXEL LED LADI (PURE COPPER)",
+  "mrp": 70,
+  "sale": 60
+ },
+ {
+  "sku": "1124",
+  "group": "PIXEL LED LADI (PURE COPPER)",
+  "mrp": 70,
+  "sale": 60
+ },
+ {
+  "sku": "1125",
+  "group": "PIXEL LED LADI (PURE COPPER)",
+  "mrp": 70,
+  "sale": 60
+ },
+ {
+  "sku": "1126",
+  "group": "PIXEL LED LADI (PURE COPPER)",
+  "mrp": 70,
+  "sale": 60
+ },
+ {
+  "sku": "1127",
+  "group": "PIXEL LED LADI (PURE COPPER)",
+  "mrp": 70,
+  "sale": 60
+ },
+ {
+  "sku": "1031",
+  "group": "ADDRESSABLE LED STRIP",
+  "mrp": 550,
+  "sale": 485
+ },
+ {
+  "sku": "1032",
+  "group": "ADDRESSABLE LED STRIP",
+  "mrp": 450,
+  "sale": 395
+ },
+ {
+  "sku": "1073",
+  "group": "8MM & DECORATIVE LIGHTS",
+  "mrp": 800,
+  "sale": 640
+ },
+ {
+  "sku": "1074",
+  "group": "8MM & DECORATIVE LIGHTS",
+  "mrp": 50,
+  "sale": 45
+ },
+ {
+  "sku": "1075",
+  "group": "8MM & DECORATIVE LIGHTS",
+  "mrp": 50,
+  "sale": 45
+ },
+ {
+  "sku": "1076",
+  "group": "8MM & DECORATIVE LIGHTS",
+  "mrp": 45,
+  "sale": 40
+ },
+ {
+  "sku": "1077",
+  "group": "8MM & DECORATIVE LIGHTS",
+  "mrp": 50,
+  "sale": 45
+ },
+ {
+  "sku": "1078",
+  "group": "8MM & DECORATIVE LIGHTS",
+  "mrp": 50,
+  "sale": 45
+ },
+ {
+  "sku": "1079",
+  "group": "8MM & DECORATIVE LIGHTS",
+  "mrp": 55,
+  "sale": 50
+ },
+ {
+  "sku": "1094",
+  "group": "8MM & DECORATIVE LIGHTS",
+  "mrp": 80,
+  "sale": 70
+ },
+ {
+  "sku": "1038",
+  "group": "READYMADE SETUP & PIPE LIGHT",
+  "mrp": 399,
+  "sale": 320
+ },
+ {
+  "sku": "1065",
+  "group": "READYMADE SETUP & PIPE LIGHT",
+  "mrp": 1200,
+  "sale": 960
+ },
+ {
+  "sku": "1066",
+  "group": "READYMADE SETUP & PIPE LIGHT",
+  "mrp": 1200,
+  "sale": 960
+ },
+ {
+  "sku": "1141",
+  "group": "LED FLASHER",
+  "mrp": 200,
+  "sale": 175
+ },
+ {
+  "sku": "1142",
+  "group": "LED FLASHER",
+  "mrp": 200,
+  "sale": 175
+ },
+ {
+  "sku": "1143",
+  "group": "LED FLASHER",
+  "mrp": 200,
+  "sale": 175
+ },
+ {
+  "sku": "1144",
+  "group": "LED FLASHER",
+  "mrp": 200,
+  "sale": 175
+ },
+ {
+  "sku": "1145",
+  "group": "LED FLASHER",
+  "mrp": 200,
+  "sale": 175
+ },
+ {
+  "sku": "1200",
+  "group": "AC PIXEL STRING LIGHT",
+  "mrp": 250,
+  "sale": 200
+ },
+ {
+  "sku": "1201",
+  "group": "AC PIXEL STRING LIGHT",
+  "mrp": 310,
+  "sale": 250
+ },
+ {
+  "sku": "2003",
+  "group": "LED CONTROLLERS",
+  "mrp": 1850,
+  "sale": 1630
+ },
+ {
+  "sku": "2004",
+  "group": "LED CONTROLLERS",
+  "mrp": 1850,
+  "sale": 1630
+ },
+ {
+  "sku": "2007",
+  "group": "LED CONTROLLERS",
+  "mrp": 200,
+  "sale": 175
+ },
+ {
+  "sku": "2009",
+  "group": "LED CONTROLLERS",
+  "mrp": 99,
+  "sale": 85
+ },
+ {
+  "sku": "2010",
+  "group": "LED CONTROLLERS",
+  "mrp": 150,
+  "sale": 130
+ },
+ {
+  "sku": "2011",
+  "group": "LED CONTROLLERS",
+  "mrp": 299,
+  "sale": 265
+ },
+ {
+  "sku": "2014",
+  "group": "LED CONTROLLERS",
+  "mrp": 300,
+  "sale": 265
+ },
+ {
+  "sku": "2016",
+  "group": "LED CONTROLLERS",
+  "mrp": 800,
+  "sale": 705
+ },
+ {
+  "sku": "2017",
+  "group": "LED CONTROLLERS",
+  "mrp": 1000,
+  "sale": 880
+ },
+ {
+  "sku": "2018",
+  "group": "LED CONTROLLERS",
+  "mrp": 750,
+  "sale": 660
+ },
+ {
+  "sku": "2019",
+  "group": "LED CONTROLLERS",
+  "mrp": 300,
+  "sale": 265
+ },
+ {
+  "sku": "2020",
+  "group": "LED CONTROLLERS",
+  "mrp": 400,
+  "sale": 350
+ },
+ {
+  "sku": "2021",
+  "group": "LED CONTROLLERS",
+  "mrp": 1500,
+  "sale": 1320
+ },
+ {
+  "sku": "2028",
+  "group": "LED CONTROLLERS",
+  "mrp": 400,
+  "sale": 350
+ },
+ {
+  "sku": "2031",
+  "group": "LED CONTROLLERS",
+  "mrp": 450,
+  "sale": 395
+ },
+ {
+  "sku": "3001",
+  "group": "POWER SUPPLY & ADAPTER",
+  "mrp": 200,
+  "sale": 175
+ },
+ {
+  "sku": "3003",
+  "group": "POWER SUPPLY & ADAPTER",
+  "mrp": 180,
+  "sale": 160
+ },
+ {
+  "sku": "3010",
+  "group": "POWER SUPPLY & ADAPTER",
+  "mrp": 1000,
+  "sale": 880
+ },
+ {
+  "sku": "3024",
+  "group": "POWER SUPPLY & ADAPTER",
+  "mrp": 100,
+  "sale": 90
+ },
+ {
+  "sku": "3025",
+  "group": "POWER SUPPLY & ADAPTER",
+  "mrp": 150,
+  "sale": 130
+ },
+ {
+  "sku": "3026",
+  "group": "POWER SUPPLY & ADAPTER",
+  "mrp": 150,
+  "sale": 130
+ },
+ {
+  "sku": "3036",
+  "group": "POWER SUPPLY & ADAPTER",
+  "mrp": 450,
+  "sale": 395
+ },
+ {
+  "sku": "4001",
+  "group": "CONNECTION PATTA",
+  "mrp": 685,
+  "sale": null
+ },
+ {
+  "sku": "4002",
+  "group": "CONNECTION PATTA",
+  "mrp": 1320,
+  "sale": null
+ },
+ {
+  "sku": "4003",
+  "group": "CONNECTION PATTA",
+  "mrp": 1950,
+  "sale": null
+ },
+ {
+  "sku": "4004",
+  "group": "CONNECTION PATTA",
+  "mrp": 770,
+  "sale": null
+ },
+ {
+  "sku": "4005",
+  "group": "CONNECTION PATTA",
+  "mrp": 1485,
+  "sale": null
+ },
+ {
+  "sku": "4006",
+  "group": "CONNECTION PATTA",
+  "mrp": 2195,
+  "sale": null
+ },
+ {
+  "sku": "4007",
+  "group": "CONNECTION PATTA",
+  "mrp": 735,
+  "sale": null
+ },
+ {
+  "sku": "4008",
+  "group": "CONNECTION PATTA",
+  "mrp": 1420,
+  "sale": null
+ },
+ {
+  "sku": "4009",
+  "group": "CONNECTION PATTA",
+  "mrp": 2105,
+  "sale": null
+ },
+ {
+  "sku": "4011",
+  "group": "CONNECTION PATTA",
+  "mrp": 3035,
+  "sale": null
+ },
+ {
+  "sku": "4042",
+  "group": "CONNECTION PATTA",
+  "mrp": 1365,
+  "sale": null
+ },
+ {
+  "sku": "5001",
+  "group": "FLOOD LIGHT",
+  "mrp": 1250,
+  "sale": 1000
+ },
+ {
+  "sku": "6002",
+  "group": "CONNECTORS",
+  "mrp": 100,
+  "sale": null
+ },
+ {
+  "sku": "6004",
+  "group": "CONNECTORS",
+  "mrp": 200,
+  "sale": null
+ },
+ {
+  "sku": "6005",
+  "group": "CONNECTORS",
+  "mrp": 200,
+  "sale": null
+ },
+ {
+  "sku": "6007",
+  "group": "CONNECTORS",
+  "mrp": 180,
+  "sale": null
+ },
+ {
+  "sku": "6011",
+  "group": "CONNECTORS",
+  "mrp": 200,
+  "sale": null
+ },
+ {
+  "sku": "6015",
+  "group": "CONNECTORS",
+  "mrp": 100,
+  "sale": null
+ },
+ {
+  "sku": "7001",
+  "group": "DATA WIRE & LAN CABLE",
+  "mrp": 400,
+  "sale": null
+ },
+ {
+  "sku": "7002",
+  "group": "DATA WIRE & LAN CABLE",
+  "mrp": 800,
+  "sale": null
+ },
+ {
+  "sku": "7019",
+  "group": "DATA WIRE & LAN CABLE",
+  "mrp": 3000,
+  "sale": null
+ },
+ {
+  "sku": "8006",
+  "group": "ACCESSORIES & CONSUMABLES",
+  "mrp": 400,
+  "sale": null
+ },
+ {
+  "sku": "8007",
+  "group": "ACCESSORIES & CONSUMABLES",
+  "mrp": 400,
+  "sale": null
+ },
+ {
+  "sku": "8012",
+  "group": "ACCESSORIES & CONSUMABLES",
+  "mrp": 120,
+  "sale": null
+ },
+ {
+  "sku": "8017",
+  "group": "ACCESSORIES & CONSUMABLES",
+  "mrp": 500,
+  "sale": null
+ },
+ {
+  "sku": "8052",
+  "group": "ACCESSORIES & CONSUMABLES",
+  "mrp": 200,
+  "sale": null
+ },
+ {
+  "sku": "8053",
+  "group": "ACCESSORIES & CONSUMABLES",
+  "mrp": 250,
+  "sale": null
+ },
+ {
+  "sku": "8054",
+  "group": "ACCESSORIES & CONSUMABLES",
+  "mrp": 300,
+  "sale": null
+ },
+ {
+  "sku": "8055",
+  "group": "ACCESSORIES & CONSUMABLES",
+  "mrp": 350,
+  "sale": null
+ },
+ {
+  "sku": "8056",
+  "group": "ACCESSORIES & CONSUMABLES",
+  "mrp": 400,
+  "sale": null
+ },
+ {
+  "sku": "8057",
+  "group": "ACCESSORIES & CONSUMABLES",
+  "mrp": 450,
+  "sale": null
+ },
+ {
+  "sku": "8058",
+  "group": "ACCESSORIES & CONSUMABLES",
+  "mrp": 500,
+  "sale": null
+ }
+]
