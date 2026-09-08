@@ -87,16 +87,35 @@ function loadMenu() {
   return list;
 }
 
-/* SALE entry ka handle dhoondo: pehle menu.json, warna diya hua handle */
-function resolveHandle(entry, menu) {
-  const want = String(entry.menu || '').toLowerCase().trim();
-  if (want) {
-    let hit = menu.find(m => m.name.toLowerCase().trim() === want);
-    if (!hit) hit = menu.find(m => m.name.toLowerCase().includes(want));
-    if (!hit) hit = menu.find(m => m.path.join(' > ').toLowerCase().includes(want));
-    if (hit) return hit.handle;
+/* SALE entry se menu.json ke SAARE matching collections nikalo
+   (parent + uske sub-collections). Parent khali ho to bhi products mil jayenge. */
+function resolveNodes(entry, menu) {
+  const term = String(entry.menu || '').toLowerCase().trim();
+  let hits = [];
+
+  if (term) {
+    const tokens = term.split(/\s+/).filter(Boolean);
+    const hasAll = txt => tokens.every(t =>
+      new RegExp('(^|[^a-z0-9])' + t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^a-z0-9]|$)', 'i').test(txt));
+
+    // jis node ka naam match kare
+    const direct = menu.filter(m => hasAll(m.name));
+
+    // + un nodes ke saare sub-collections
+    const all = new Set(direct.map(d => d.handle));
+    for (const d of direct) {
+      const pre = d.path.join(' > ') + ' > ';
+      for (const m of menu) if ((m.path.join(' > ') + ' > ').startsWith(pre)) all.add(m.handle);
+    }
+    hits = menu.filter(m => all.has(m.handle));
   }
-  return entry.handle || null;
+
+  // menu me kuch na mile to diya hua handle
+  if (!hits.length) return entry.handle ? { main: entry.handle, handles: [entry.handle] } : null;
+
+  // sabse upar wala node = offer page ka link
+  hits.sort((a, b) => a.path.length - b.path.length || a.name.length - b.name.length);
+  return { main: hits[0].handle, handles: [...new Set(hits.map(h => h.handle))] };
 }
 
 /* ---------- SHOPIFY ---------- */
@@ -111,30 +130,50 @@ async function gql(query, variables) {
   return j.data;
 }
 
-/* Sirf count + kuch sample photo chahiye — poori list nahi */
-async function fetchCollection(handle) {
-  const d = await gql(`
-    query($h: String!, $n: Int!, $px: Int!) {
-      collectionByHandle(handle: $h) {
-        title
-        productsCount { count }
-        products(first: $n, sortKey: BEST_SELLING) {
-          nodes {
-            title
-            featuredImage { url(transform: {maxWidth: $px, maxHeight: $px, preferredContentType: WEBP}) }
+/* Ek collection ke saare product IDs + photos */
+async function collectionProducts(handle) {
+  const out = [];
+  let cursor = null, more = true, guard = 0;
+  while (more && guard++ < 40) {
+    const d = await gql(`
+      query($h: String!, $cursor: String, $px: Int!) {
+        collectionByHandle(handle: $h) {
+          products(first: 250, after: $cursor, sortKey: BEST_SELLING) {
+            nodes {
+              id
+              featuredImage { url(transform: {maxWidth: $px, maxHeight: $px, preferredContentType: WEBP}) }
+            }
+            pageInfo { hasNextPage endCursor }
           }
         }
-      }
-    }`, { h: handle, n: Math.max(CFG.SAMPLES, 1), px: CFG.IMG_PX });
+      }`, { h: handle, cursor, px: CFG.IMG_PX });
 
-  if (!d.collectionByHandle) return null;
-  const c = d.collectionByHandle;
-  return {
-    title: c.title,
-    handle,
-    count: c.productsCount.count,
-    samples: c.products.nodes.filter(p => p.featuredImage).map(p => p.featuredImage.url)
-  };
+    if (!d.collectionByHandle) return null;
+    const pr = d.collectionByHandle.products;
+    out.push(...pr.nodes);
+    more = pr.pageInfo.hasNextPage;
+    cursor = pr.pageInfo.endCursor;
+  }
+  return out;
+}
+
+/* Sab handles ko jodo, duplicate hatao */
+async function fetchGroup(handles) {
+  const seen = new Set();
+  const samples = [];
+  let missing = 0;
+
+  for (const h of handles) {
+    const prods = await collectionProducts(h);
+    if (prods === null) { missing++; continue; }
+    for (const p of prods) {
+      if (seen.has(p.id)) continue;
+      seen.add(p.id);
+      if (p.featuredImage && samples.length < CFG.SAMPLES) samples.push(p.featuredImage.url);
+    }
+  }
+  if (missing) console.log(`  (${missing} collection Shopify me nahi mile)`);
+  return { count: seen.size, samples };
 }
 
 /* ---------- ITEM PRODUCTS (sale-items.json ke SKU) ---------- */
@@ -398,14 +437,14 @@ function docHtml(cats, secs, logo) {
 
   const cats = [];
   for (const e of SALE) {
-    const handle = resolveHandle(e, menu);
-    if (!handle) { console.log(`SKIP ${e.name} — menu.json mein bhi nahi, handle bhi nahi diya`); continue; }
+    const node = resolveNodes(e, menu);
+    if (!node) { console.log(`SKIP ${e.name} — menu.json me bhi nahi, handle bhi nahi diya`); continue; }
 
-    const data = await fetchCollection(handle);
-    if (!data) { console.log(`SKIP ${e.name} — collection "${handle}" Shopify mein nahi mila`); continue; }
+    const data = await fetchGroup(node.handles);
+    if (!data.count) { console.log(`SKIP ${e.name} — ${node.handles.length} collection dekhe, 0 products`); continue; }
 
-    console.log(`${e.name}  ->  ${handle}  (${data.count} products)`);
-    cats.push({ ...e, handle, count: data.count, samples: data.samples });
+    console.log(`${e.name}  ->  ${node.main}  +${node.handles.length - 1} sub  =  ${data.count} products`);
+    cats.push({ ...e, handle: node.main, count: data.count, samples: data.samples });
   }
 
   const items = loadItems();
