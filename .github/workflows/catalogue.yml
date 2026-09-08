@@ -26,7 +26,13 @@ jobs:
           SHOPIFY_SHOP: ${{ secrets.SHOPIFY_SHOP }}
           SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
         run: npm run build
-
+        
+      - name: Build Navratri Sale PDF
+        env:
+          SHOPIFY_SHOP: ${{ secrets.SHOPIFY_SHOP }}
+          SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
+        run: node sale.js
+        
       - name: Publish to Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
