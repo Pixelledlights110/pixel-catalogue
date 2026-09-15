@@ -27,15 +27,15 @@ const CFG = {
 
   SHOW_PRICE: true,
   ONLY_IN_STOCK: false,
-  PER_ROW: 3,
-  IMG_PX: 250,
+  PER_ROW: 4,
+  IMG_PX: 170,
 
-  SPLIT_ABOVE: 250,      // itne se zyada products = category tod do
+  SPLIT_ABOVE: 150,      // itne se zyada products = category tod do
   MAX_MB: 90,            // GitHub limit safety
   MAKE_FULL: false,      // 1700 products ki ek PDF kaam ki nahi — band rakha hai
 
   // Ye categories kabhi nahi tutengi — ek hi PDF banegi (chhoti image + 4 per row)
-  SINGLE_FILE: ['LED controllers'],
+  SINGLE_FILE: [],
   IMG_PX_SMALL: 150,
   PER_ROW_SMALL: 4,
 
